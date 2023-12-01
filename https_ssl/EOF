@@ -1,0 +1,30 @@
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.13.0-1022-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Fri Dec  1 17:51:37 UTC 2023
+
+  System load:  0.08               Processes:             149
+  Usage of /:   12.4% of 19.32GB   Users logged in:       1
+  Memory usage: 33%                IPv4 address for eth0: 10.250.16.132
+  Swap usage:   0%
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+11 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+*** System restart required ***
+Last login: Sun Nov 26 17:18:10 2023 from 54.234.106.204
+]0;ubuntu@5795-web-01: ~ubuntu@5795-web-01:~$ 
