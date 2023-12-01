@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Domain and Subdomain
+
+domain=$1
+subdomain=$2
+
+if [ $# -eq 2 ];
+then
+	record_type="$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $4 }')"
+	dest_server_ip="$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $5 }')"
+	echo "The subdomain "$subdomain" is a "$record_type" record and points to "$dest_server_ip""
+else
+	subdomains=("www" "lb-01" "web-01" "web-02")
+	for sub_domain in "${subdomains[@]}"; do
+		record_type="$(dig "$sub_domain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $4 }')"
+		dest_server_ip="$(dig "$sub_domain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $5 }')"
+		echo "The subdomain "$sub_domain" is a "$record_type" record and points to "$dest_server_ip""
+	done
+fi
