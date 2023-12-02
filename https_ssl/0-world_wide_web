@@ -2,38 +2,18 @@
 # Domain and Subdomain
 
 domain=$1
-ssh -i ~/.ssh/school ubuntu@3.85.169.89 >> EOF
-# Define a map for expected IP addresses for specific subdomains
-declare -A expected_ips
-expected_ips["www"]="52.91.38.59"
-expected_ips["web-01"]="3.85.169.89"
-expected_ips["web-02"]="54.91.1.41"
+subdomain=$2
 
-# Function to extract record type and destination IP
-get_dns_details() {
-    local subdomain=$1
-    record_type="$(dig +short "$subdomain.$domain" A)"
-    if [ -n "$record_type" ]; then
-        echo "$record_type"
-    else
-        echo "No record found"
-    fi
-}
-# Check for specific subdomain or loop through predefined subdomains
-if [ $# -eq 1 ]; then
-    subdomains=("www" "lb-01" "web-01" "web-02")
-    for sub_domain in "${subdomains[@]}"; do
-        dest_server_ip=$(get_dns_details "$sub_domain")
-        echo "Your subdomain $sub_domain points to $dest_server_ip"
-
-        # Check if IP matches the expected IP for this subdomain
-        if [ "${expected_ips[$sub_domain]}" == "$dest_server_ip" ]; then
-            echo "PASS: Correct IP for $sub_domain"
-        else
-            echo "FAIL: Incorrect IP for $sub_domain"
-        fi
-    done
+if [ $# -eq 2 ];
+then
+	record_type="$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $4 }')"
+	dest_server_ip="$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $5 }')"
+	echo "The subdomain "$subdomain" is a "$record_type" record and points to "$dest_server_ip""
 else
-    echo "Invalid number of arguments. Please provide only the domain."
+	subdomains=("www" "lb-01" "web-01" "web-02")
+	for sub_domain in "${subdomains[@]}"; do
+		record_type="$(dig "$sub_domain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $4 }')"
+		dest_server_ip="$(dig "$sub_domain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{ print $5 }')"
+		echo "The subdomain "$sub_domain" is a "$record_type" record and points to "$dest_server_ip""
+	done
 fi
-EOF
