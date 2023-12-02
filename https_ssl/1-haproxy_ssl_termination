@@ -1,4 +1,4 @@
-global
+~global
     log /dev/log local0
     log /dev/log local1 notice
     chroot /var/lib/haproxy
@@ -49,4 +49,4 @@ listen stats
     mode http
     stats enable
     stats uri /haproxy-stats
-    stats refresh 10s
+    stats refresh 10s                              
