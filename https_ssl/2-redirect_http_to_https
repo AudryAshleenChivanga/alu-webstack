@@ -32,7 +32,7 @@ frontend www-http
     use_backend www-backend if host_www
 
 frontend www-https
-    bind *:443 ssl crt /home/ubuntu/ssl
+    bind *:443 ssl crt /etc/letsencrypt/live/www.mediqueueless.tech/fullchain.pem
     mode http
     acl host_www hdr(host) -i www.mediqueueless.tech
     use_backend www-backend if host_www
