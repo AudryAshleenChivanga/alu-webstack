@@ -2,12 +2,14 @@ global
         log /dev/log    local0
         log /dev/log    local1 notice
         chroot /var/lib/haproxy
-        stats socket /run/haproxy/admin.sock mode 660 level admin
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
         stats timeout 30s
         user haproxy
         group haproxy
         daemon
+        maxconn 2048
 
+        tune.ssl.default-dh-param 2048
         # Default SSL material locations
         ca-base /etc/ssl/certs
         crt-base /etc/ssl/private
@@ -33,23 +35,22 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
-frontend ALL
+frontend www-http
         bind *:80
-        bind *:443 ssl crt  /etc/letsencrypt/live/www.mediqueueless.tech/fullchain.pem
+        http-request add-header -Forwarded-Proto http
         mode http
+        default_backend www-backend
+frontend www-https
+        bind *:443 ssl crt /etc/haproxy/www.mediqueueless.tech.pem
+        http-request set-header X-Forwaded-Proto https
+        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+        use_backend letsencrypt-backend if letsencrypt-acl
+        default_backend www-backend
 
-        # Define path for lets encrypt
-        acl is_letsencrypt path_beg -i /.well-known/acme-challenge/
+backend www-backend
+        redirect scheme https unless { ssl_fc }
+        server 5795-we-01 3.85.169.89:80 check
+        server 5795-web-02 54.91.1.41:80 check
 
-       #Getting to letsencrypt
-
-        use_backend letsencrypt if is_letsencrypt
-        default_backend lb-backend
-
-backend letsencrypt
-        server letsencrypt 127.0.0.1:8888
- 
-backend lb-backend
-        balance roundrobin
-        server web-01 3.85.169.89:80 check
-        server web-02 54.91.1.41 check
+backend letsencrypt-backend
+        server letsencrypt 127.0.0.1:54321
